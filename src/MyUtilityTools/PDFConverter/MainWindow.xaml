@@ -1,0 +1,20 @@
+﻿<Window x:Class="PDFConverter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PDFConverter"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="the Paths of text files" VerticalAlignment="Top"/>
+        <TextBox x:Name="Paths_TextBox" Margin="10,33,100,67" TextWrapping="Wrap" AcceptsReturn="True"/>
+        
+        <TextBlock HorizontalAlignment="Left" Margin="10,0,0,39" TextWrapping="Wrap" Text="Concatenated PDF file path" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="OutputFilePath_TextBox" Height="23" Margin="10,0,135,10" VerticalAlignment="Bottom"/>
+        <Button x:Name="OutputFilePathBrowse_Button" Content="..." HorizontalAlignment="Right" Margin="0,0,100,10" VerticalAlignment="Bottom" Width="30" Click="OutputFilePathBrowse_Button_Click"/>
+
+        <Button x:Name="Convert_Button" Content="Convert &amp;&#xA;Concatenate" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="85" Height="47" Click="Convert_Button_Click"/>
+        
+    </Grid>
+</Window>
