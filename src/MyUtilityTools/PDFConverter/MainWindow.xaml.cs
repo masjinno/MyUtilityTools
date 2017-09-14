@@ -25,7 +25,11 @@ namespace PDFConverter
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int[] margin = new int[] { 10, 10, 30, 10 };
+        const float FONT_SIZE = 10.0f;
+        const string FONT_NAME = "ms gothic";//"ms gothic"; //"ms micho";
+        const string FONT_FILENAME = @"C:\Windows\Fonts\msgothic.ttc,0";
+
+        private PDFConverter.DocumentMargin margin;
 
         private string outputFilePath
         {
@@ -43,6 +47,8 @@ namespace PDFConverter
         {
             InitializeComponent();
 
+            margin = new DocumentMargin(20f, 20f, 50f, 20f);
+
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             this.outputFilePath = System.IO.Path.GetDirectoryName(exePath) + @"\OUTPUT.pdf";
         }
@@ -52,23 +58,18 @@ namespace PDFConverter
 
         }
 
-        private Document SetDocument(string path)
+        private Font GetFont()
         {
-            Document retDoc = new Document(PageSize.A4, margin[0], margin[1], margin[2], margin[3]);
-            FileStream pdfStream = new FileStream(path, FileMode.Create);
-            PdfWriter pdfWriter = PdfWriter.GetInstance(retDoc, pdfStream);
-
-            return retDoc;
-        }
-
-        private Font GetBaseFont()
-        {
-            const float FONT_SIZE = 7.0f;
-            const string FONT_NAME = "MS Gothic"; //"MS Micho";
             FontFactory.RegisterDirectories();
             Font retFont = FontFactory.GetFont(FONT_NAME, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, FONT_SIZE);
-
             return retFont;
+        }
+
+        private BaseFont GetBaseFont()
+        {
+            FontFactory.RegisterDirectories();
+            BaseFont retBaseFont = BaseFont.CreateFont(FONT_FILENAME, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            return retBaseFont;
         }
 
         private void Convert_Button_Click(object sender, RoutedEventArgs e)
@@ -89,32 +90,49 @@ namespace PDFConverter
                 return;
             }
 
-            Font baseFont = GetBaseFont();
+            Font font = GetFont();
+            BaseFont baseFont = GetBaseFont();
 
             List<string> eachPdfPathList = new List<string>();
             foreach (string textPath in pathList)
             {
                 string pdfPath = textPath + ".pdf";
                 eachPdfPathList.Add(pdfPath);
-                //string textName = System.IO.Path.GetFileName(textPath);
-                Document doc = this.SetDocument(pdfPath);
-                //PdfWriter pdfWriter = PdfWriter.GetInstance(doc, new FileStream(pdfPath, FileMode.Create));
-                doc.Open();
 
-                //PdfContentByte pcb = pdfWriter.DirectContent;
-                //pcb.MoveTo(0, );
-                //pcb.LineTo(595, 820);
-                //pcb.Stroke();
+                using (FileStream fs = new FileStream(pdfPath, FileMode.Create))
+                {
+                    using (Document doc = new Document(PageSize.A4, margin.left, margin.right, margin.top, margin.bottom))
+                    {
+                        PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
+                        ITextEvents itextEvents = new ITextEvents();
+                        itextEvents.Margin = margin;
+                        itextEvents.HeaderFont = font;
+                        itextEvents.HeaderBaseFont = baseFont;
+                        pdfWriter.PageEvent = itextEvents;
+                        doc.Open();
 
-                ///TODO: ファイルエンコードの取得と設定
-                ///932:SJIS
-                Encoding enc = Encoding.GetEncoding(932);
-                StreamReader sr = new StreamReader(textPath, enc);
-                string text = sr.ReadToEnd();
-                sr.Close();
-                doc.Add(new iTextSharp.text.Paragraph(text, baseFont));
+                        ///TODO: ファイルエンコードの取得と設定
+                        ///932:SJIS
+                        Encoding enc = Encoding.GetEncoding(932);
+                        StreamReader sr = new StreamReader(textPath, enc);
+                        string text = sr.ReadToEnd();
 
-                doc.Close();
+                        #region how to research usable fonts
+                        //int totalfonts = FontFactory.RegisterDirectory("C:\\WINDOWS\\Fonts");
+                        //StringBuilder sb = new StringBuilder();
+                        //foreach (string fontname in FontFactory.RegisteredFonts)
+                        //{
+                        //    sb.Append(fontname + "\n");
+                        //}
+                        //doc.Add(new iTextSharp.text.Paragraph("All Fonts:\n" + sb.ToString()));
+                        #endregion
+
+                        sr.Close();
+                        doc.Add(new iTextSharp.text.Paragraph(text, font));
+
+                        doc.Close();
+                    }
+                }
             }
             
             this.JoinPdf(this.outputFilePath, eachPdfPathList);
@@ -159,16 +177,6 @@ namespace PDFConverter
 
                 joinedDoc.Open();
 
-                /// 出力するPDFのプロパティを設定
-                //objITextDoc.AddKeywords("キーワードです。");
-                //objITextDoc.AddAuthor("zero0nine.com");
-                //objITextDoc.AddTitle("結合したPDFファイルです。");
-                //objITextDoc.AddCreator("PDFファイル結合くん");
-                //objITextDoc.AddSubject("結合したPDFファイル");
-
-                /// ソートが必要ない場合は、コメント
-                //pdfList.Sort();
-
                 /// 結合対象ファイル分ループ
                 pdfList.ForEach(list =>
                 {
@@ -192,24 +200,6 @@ namespace PDFConverter
             }
 
             return ret;
-        }
-    }
-
-    class MyHeaderFooterEvent : PdfPageEventHelper
-    {
-        Font FONT = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-
-        public override void OnEndPage(PdfWriter writer, Document document)
-        {
-            PdfContentByte canvas = writer.DirectContent;
-            ColumnText.ShowTextAligned(
-              canvas, Element.ALIGN_LEFT,
-              new Phrase("Header", FONT), 10, 810, 0
-            );
-            ColumnText.ShowTextAligned(
-              canvas, Element.ALIGN_LEFT,
-              new Phrase("Footer", FONT), 10, 10, 0
-            );
         }
     }
 }

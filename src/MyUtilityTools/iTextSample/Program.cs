@@ -19,7 +19,9 @@ namespace ConsoleApplication1
         {
             try
             {
-                itext();
+                // itext();
+
+                CreatePDF();
             }
             catch (Exception ex)
             {
@@ -29,6 +31,7 @@ namespace ConsoleApplication1
 
         }
 
+        #region 別のサンプル
         static void itext()
         {
             string thisPath = Assembly.GetExecutingAssembly().Location;
@@ -236,5 +239,50 @@ namespace ConsoleApplication1
             doc.Close();
 
         }
+        #endregion
+
+        private static void CreatePDF()
+        {
+            string fileName = string.Empty;
+            DateTime fileCreationDatetime = DateTime.Now;
+            fileName = string.Format("{0}.pdf", fileCreationDatetime.ToString(@"yyyyMMdd") + "_" + fileCreationDatetime.ToString(@"HHmmss"));
+            string pdfPath = @"C:\DEV\Tools\GitHub\MyUtilityTools\src\MyUtilityTools\PDFConverter\output.pdf";
+            //Server.MapPath(@"~\PDFs\") + fileName;
+
+            using (FileStream msReport = new FileStream(pdfPath, FileMode.Create))
+            {
+                //step 1
+                using (Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 140f, 10f))
+                {
+                    try
+                    {
+                        // step 2
+                        PdfWriter pdfWriter = PdfWriter.GetInstance(pdfDoc, msReport);
+                        pdfWriter.PageEvent = new iTextSample.ITextEvents();
+
+                        //open the stream 
+                        pdfDoc.Open();
+
+                        for (int i = 0; i < 10; i++)
+                        {
+                            Paragraph para = new Paragraph("Hello world. Checking Header Footer", new Font(Font.FontFamily.HELVETICA, 22));
+                            para.Alignment = Element.ALIGN_CENTER;
+                            pdfDoc.Add(para);
+                            pdfDoc.NewPage();
+                        }
+
+                        pdfDoc.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        //handle exception
+                    }
+                    finally
+                    {
+                    }
+                }
+            }
+        }
+
     }
 }
