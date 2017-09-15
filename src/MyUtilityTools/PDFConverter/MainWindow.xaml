@@ -7,14 +7,29 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="the Paths of text files" VerticalAlignment="Top"/>
-        <TextBox x:Name="Paths_TextBox" Margin="10,33,100,67" TextWrapping="Wrap" AcceptsReturn="True"/>
-        
-        <TextBlock HorizontalAlignment="Left" Margin="10,0,0,39" TextWrapping="Wrap" Text="Concatenated PDF file path" VerticalAlignment="Bottom"/>
-        <TextBox x:Name="OutputFilePath_TextBox" Height="23" Margin="10,0,135,10" VerticalAlignment="Bottom"/>
-        <Button x:Name="OutputFilePathBrowse_Button" Content="..." HorizontalAlignment="Right" Margin="0,0,100,10" VerticalAlignment="Bottom" Width="30" Click="OutputFilePathBrowse_Button_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="55"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="130"/>
+        </Grid.ColumnDefinitions>
 
-        <Button x:Name="Convert_Button" Content="Convert &amp;&#xA;Concatenate" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="85" Height="47" Click="Convert_Button_Click"/>
-        
+        <DockPanel Grid.Row="0" Grid.Column="0" Margin="10">
+            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" Text="Paths of text files"/>
+            <TextBox x:Name="Paths_TextBox" Margin="0,5,0,0" TextWrapping="Wrap" AcceptsReturn="True"/>
+        </DockPanel>
+
+        <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,0,10,10">
+            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Concatenated PDF file path" VerticalAlignment="Bottom"/>
+            <Button DockPanel.Dock="Right" x:Name="OutputFilePathBrowse_Button" Content="..." HorizontalAlignment="Right" Width="30" Click="OutputFilePathBrowse_Button_Click" Margin="0,5,0,0" Height="23"/>
+            <TextBox x:Name="OutputFilePath_TextBox" Height="23" VerticalAlignment="Bottom" Margin="0,0,5,0"/>
+        </DockPanel>
+
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5">
+            <Button x:Name="Convert_Button" Content="Convert &amp;&#xA;Concatenate" Click="Convert_Button_Click"/>
+        </Grid>
+
     </Grid>
 </Window>
