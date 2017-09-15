@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PDFConverter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="PDF Converter"
+        Width="640"
+        Height="400">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="55"/>
+            <RowDefinition Height="57"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -22,9 +24,9 @@
         </DockPanel>
 
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,0,10,10">
-            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Concatenated PDF file path" VerticalAlignment="Bottom"/>
-            <Button DockPanel.Dock="Right" x:Name="OutputFilePathBrowse_Button" Content="..." HorizontalAlignment="Right" Width="30" Click="OutputFilePathBrowse_Button_Click" Margin="0,5,0,0" Height="23"/>
-            <TextBox x:Name="OutputFilePath_TextBox" Height="23" VerticalAlignment="Bottom" Margin="0,0,5,0"/>
+            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Concatenated PDF file path" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
+            <Button DockPanel.Dock="Right" x:Name="OutputFilePathBrowse_Button" Content="..." Click="OutputFilePathBrowse_Button_Click" Width="30" VerticalAlignment="Top"/>
+            <TextBox x:Name="OutputFilePath_TextBox" Margin="0,0,5,0" VerticalAlignment="Top"/>
         </DockPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,10,10,10" >
@@ -39,16 +41,16 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Top"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Top" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="0" Grid.Column="1" x:Name="MarginTop_TextBox" TextChanged="MarginTop_TextBox_TextChanged"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Left"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Left" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="1" x:Name="MarginLeft_TextBox" TextChanged="MarginLeft_TextBox_TextChanged"/>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Right"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Right" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="2" Grid.Column="1" x:Name="MarginRight_TextBox" TextChanged="MarginRight_TextBox_TextChanged"/>
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Bottom"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Bottom" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="3" Grid.Column="1" x:Name="MarginBottom_TextBox" TextChanged="MarginBottom_TextBox_TextChanged"/>
             </Grid>
             <TextBlock Text="Font Family" Margin="0,5,0,0"/>
