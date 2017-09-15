@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <DockPanel Grid.Row="0" Grid.Column="0" Margin="10">
-            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" Text="Paths of text files"/>
+            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" Text="Paths of text files" Margin="1,2,3,4"/>
             <TextBox x:Name="Paths_TextBox" Margin="0,5,0,0" TextWrapping="Wrap" AcceptsReturn="True"/>
         </DockPanel>
 
@@ -27,7 +27,37 @@
             <TextBox x:Name="OutputFilePath_TextBox" Height="23" VerticalAlignment="Bottom" Margin="0,0,5,0"/>
         </DockPanel>
 
-        <Grid Grid.Row="1" Grid.Column="1" Margin="5">
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,10,10,10" >
+            <TextBlock Text="Page Size"/>
+            <ComboBox x:Name="PageSize_ComboBox" SelectionChanged="PageSize_ComboBox_SelectionChanged"/>
+            <TextBlock Text="Margin" Margin="0,5,0,0"/>
+            <Grid Margin="10,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Top"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="MarginTop_TextBox" TextChanged="MarginTop_TextBox_TextChanged"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Left"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="MarginLeft_TextBox" TextChanged="MarginLeft_TextBox_TextChanged"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Right"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="MarginRight_TextBox" TextChanged="MarginRight_TextBox_TextChanged"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Bottom"/>
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="MarginBottom_TextBox" TextChanged="MarginBottom_TextBox_TextChanged"/>
+            </Grid>
+            <TextBlock Text="Font Family" Margin="0,5,0,0"/>
+            <ComboBox x:Name="FontFamily_ComboBox" SelectionChanged="FontFamily_ComboBox_SelectionChanged"/>
+            <TextBlock Text="Font Size" Margin="0,5,0,0"/>
+            <TextBox x:Name="FontSize_TextBox" TextChanged="FontSize_TextBox_TextChanged"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,10,10">
             <Button x:Name="Convert_Button" Content="Convert &amp;&#xA;Concatenate" Click="Convert_Button_Click"/>
         </Grid>
 

@@ -25,8 +25,11 @@ namespace PDFConverter
         // Margin of page
         public DocumentMargin Margin { get; set; }
 
-        // Base font
-        public iTextSharp.text.Font font { get; set; }
+        // Header font
+        public iTextSharp.text.Font headerFont { get; set; }
+
+        // Footer font
+        public iTextSharp.text.Font footerFont { get; set; }
 
         // Text file name
         public string convertedFileName { get; set; }
@@ -70,7 +73,7 @@ namespace PDFConverter
             PdfPTable pdfFooterTable = new PdfPTable(1);
 
             /// Header Setting
-            Phrase headerPhrase = new Phrase(this.convertedFileName, font);
+            Phrase headerPhrase = new Phrase(this.convertedFileName, headerFont);
             PdfPCell pdfHeaderCell = new PdfPCell(headerPhrase);
             pdfHeaderCell.HorizontalAlignment = Element.ALIGN_LEFT;
             pdfHeaderCell.VerticalAlignment = Element.ALIGN_CENTER;
@@ -78,9 +81,9 @@ namespace PDFConverter
             pdfHeaderTable.AddCell(pdfHeaderCell);
             pdfHeaderTable.TotalWidth = document.PageSize.Width - (Margin.left + Margin.right);
             pdfHeaderTable.WidthPercentage = 100;
-            pdfHeaderTable.WriteSelectedRows(0, -1, Margin.left, document.PageSize.Height - Margin.top * 0.5F, writer.DirectContent);
+            pdfHeaderTable.WriteSelectedRows(0, -1, Margin.left, document.PageSize.Height - (Margin.top - headerFont.Size * 2F), writer.DirectContent);
 
-            //Move the pointer and draw line to separate header section from rest of page
+            /// Move the pointer and draw line to separate header section from rest of page
             cb.MoveTo(Margin.left, document.PageSize.Height - Margin.top);
             cb.LineTo(document.PageSize.Width - Margin.right, document.PageSize.Height - Margin.top);
             cb.Stroke();
@@ -88,7 +91,7 @@ namespace PDFConverter
             /// Footer Setting
             StringBuilder sb = new StringBuilder();
             sb.Append("< ").Append(writer.PageNumber).Append(" >");
-            Phrase footerPhrase = new Phrase(sb.ToString());
+            Phrase footerPhrase = new Phrase(sb.ToString(), footerFont);
             PdfPCell pdfFooterCell = new PdfPCell(footerPhrase);
             pdfFooterCell.HorizontalAlignment = Element.ALIGN_CENTER;
             pdfFooterCell.VerticalAlignment = Element.ALIGN_CENTER;
@@ -96,9 +99,9 @@ namespace PDFConverter
             pdfFooterTable.AddCell(pdfFooterCell);
             pdfFooterTable.TotalWidth = document.PageSize.Width - (Margin.left + Margin.right);
             pdfFooterTable.WidthPercentage = 100;
-            pdfFooterTable.WriteSelectedRows(0, -1, Margin.left, Margin.bottom * 0.8F, writer.DirectContent);
+            pdfFooterTable.WriteSelectedRows(0, -1, Margin.left, Margin.bottom - footerFont.Size * 1.2F, writer.DirectContent);
 
-            //Move the pointer and draw line to separate footer section from rest of page
+            /// Move the pointer and draw line to separate footer section from rest of page
             cb.MoveTo(Margin.left, document.PageSize.GetBottom(Margin.bottom));
             cb.LineTo(document.PageSize.Width - Margin.right, document.PageSize.GetBottom(Margin.bottom));
             cb.Stroke();

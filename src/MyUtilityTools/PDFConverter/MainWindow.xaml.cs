@@ -25,11 +25,26 @@ namespace PDFConverter
     /// </summary>
     public partial class MainWindow : Window
     {
-        const float FONT_SIZE = 10.0f;
-        const string FONT_NAME = "ms gothic";//"ms gothic"; //"ms micho";
-        const string FONT_FILENAME = @"C:\Windows\Fonts\msgothic.ttc,0";
+        private const string DEFAULT_PAGE_SIZE = "A4";
+        private const float DEFAULT_FONT_SIZE = 10F;
+        private const string DEFAULT_FONT_NAME = "ms gothic";//"ms gothic"; //"ms micho";
+        private const string DEFAULT_FONT_FILENAME = @"C:\Windows\Fonts\msgothic.ttc,0";
+        private const float DEFAULT_MARGIN_LEFT = 30F;
+        private const float DEFAULT_MARGIN_RIGHT = 30F;
+        private const float DEFAULT_MARGIN_TOP = 50F;
+        private const float DEFAULT_MARGIN_BOTTOM = 50F;
 
         private PDFConverter.DocumentMargin margin;
+        private iTextSharp.text.Rectangle pageSize;
+        private float fontSize = 10F;
+
+        private readonly Dictionary<string, iTextSharp.text.Rectangle> PageSizeDictionary = new Dictionary<string, iTextSharp.text.Rectangle>()
+        {
+            { "A0", PageSize.A0 }, { "A1", PageSize.A1 }, { "A2", PageSize.A2 }, { "A3", PageSize.A3 }, { "A4", PageSize.A4 }, { "A5", PageSize.A5 },
+            { "A6", PageSize.A6 }, { "A7", PageSize.A7 }, { "A8", PageSize.A8 }, { "A9", PageSize.A9 }, { "A10", PageSize.A10 },
+            { "B0", PageSize.B0 }, { "B1", PageSize.B1 }, { "B2", PageSize.B2 }, { "B3", PageSize.B3 }, { "B4", PageSize.B4 }, { "B5", PageSize.B5 },
+            { "B6", PageSize.B6 }, { "B7", PageSize.B7 }, { "B8", PageSize.B8 }, { "B9", PageSize.B9 }, { "B10", PageSize.B10 },
+        };
 
         private string outputFilePath
         {
@@ -47,7 +62,12 @@ namespace PDFConverter
         {
             InitializeComponent();
 
-            margin = new DocumentMargin(30f, 30f, 50f, 50f);
+            margin = new DocumentMargin();
+
+            this.InitPageSize();
+            this.InitMargin();
+            this.InitFontFamily();
+            this.InitFontSize();
 
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             this.outputFilePath = System.IO.Path.GetDirectoryName(exePath) + @"\OUTPUT.pdf";
@@ -58,17 +78,50 @@ namespace PDFConverter
 
         }
 
-        private Font GetFont()
+        private void InitPageSize()
+        {
+            foreach (string key in PageSizeDictionary.Keys)
+            {
+                this.PageSize_ComboBox.Items.Add(key);
+            }
+            PageSize_ComboBox.SelectedItem = DEFAULT_PAGE_SIZE;
+        }
+
+        private void InitMargin()
+        {
+            this.MarginLeft_TextBox.Text = DEFAULT_MARGIN_LEFT.ToString();
+            this.MarginRight_TextBox.Text = DEFAULT_MARGIN_RIGHT.ToString();
+            this.MarginTop_TextBox.Text = DEFAULT_MARGIN_TOP.ToString();
+            this.MarginBottom_TextBox.Text = DEFAULT_MARGIN_BOTTOM.ToString();
+        }
+
+        private void InitFontFamily()
+        {
+            FontFactory.RegisterDirectory("C:\\WINDOWS\\Fonts");
+            foreach (string fontname in FontFactory.RegisteredFonts)
+            {
+                FontFamily_ComboBox.Items.Add(fontname);
+            }
+            FontFamily_ComboBox.SelectedItem = DEFAULT_FONT_NAME;
+        }
+
+        private void InitFontSize()
+        {
+            FontSize_TextBox.Text = DEFAULT_FONT_SIZE.ToString();
+        }
+
+
+        private Font GetFont(string fontname, float fontsize)
         {
             FontFactory.RegisterDirectories();
-            Font retFont = FontFactory.GetFont(FONT_NAME, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, FONT_SIZE);
+            Font retFont = FontFactory.GetFont(fontname, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, fontsize);
             return retFont;
         }
 
         private BaseFont GetBaseFont()
         {
             FontFactory.RegisterDirectories();
-            BaseFont retBaseFont = BaseFont.CreateFont(FONT_FILENAME, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            BaseFont retBaseFont = BaseFont.CreateFont(DEFAULT_FONT_FILENAME, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             return retBaseFont;
         }
 
@@ -90,7 +143,9 @@ namespace PDFConverter
                 return;
             }
 
-            Font font = GetFont();
+            Font bodyFont = GetFont(FontFamily_ComboBox.SelectedItem.ToString(), this.fontSize);
+            Font headerFont = GetFont(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE);
+            Font footerFont = GetFont(DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE);
             BaseFont baseFont = GetBaseFont();
 
             List<string> eachPdfPathList = new List<string>();
@@ -103,12 +158,13 @@ namespace PDFConverter
 
                 using (FileStream fs = new FileStream(pdfPath, FileMode.Create))
                 {
-                    using (Document doc = new Document(PageSize.A4, margin.left, margin.right, margin.top, margin.bottom))
+                    using (Document doc = new Document(this.pageSize, this.margin.left, this.margin.right, this.margin.top, this.margin.bottom))
                     {
                         PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
                         ITextEvents itextEvents = new ITextEvents();
                         itextEvents.Margin = margin;
-                        itextEvents.font = font;
+                        itextEvents.headerFont = headerFont;
+                        itextEvents.footerFont = footerFont;
                         itextEvents.baseFont = baseFont;
                         itextEvents.convertedFileName = textFileName;
                         pdfWriter.PageEvent = itextEvents;
@@ -131,7 +187,7 @@ namespace PDFConverter
                         #endregion
 
                         sr.Close();
-                        doc.Add(new iTextSharp.text.Paragraph(text, font));
+                        doc.Add(new iTextSharp.text.Paragraph(text, bodyFont));
 
                         doc.Close();
                     }
@@ -203,6 +259,65 @@ namespace PDFConverter
             }
 
             return ret;
+        }
+
+        private void ParseTextToFloat(string text, ref float value)
+        {
+            float tmpValue;
+
+            if (float.TryParse(text, out tmpValue))
+            {
+                value = tmpValue;
+            }
+            else
+            {
+                MessageBox.Show("Input text is invalid.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void PageSize_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            pageSize = PageSizeDictionary[(sender as ComboBox).SelectedItem.ToString()];
+        }
+
+        private void MarginTop_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float tmp = margin.top;
+            ParseTextToFloat((sender as TextBox).Text, ref tmp);
+            margin.top = tmp;
+        }
+
+        private void MarginLeft_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float tmp = margin.left;
+            ParseTextToFloat((sender as TextBox).Text, ref tmp);
+            margin.left = tmp;
+        }
+
+        private void MarginRight_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float tmp = margin.right;
+            ParseTextToFloat((sender as TextBox).Text, ref tmp);
+            margin.right = tmp;
+        }
+
+        private void MarginBottom_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float tmp = margin.bottom;
+            ParseTextToFloat((sender as TextBox).Text, ref tmp);
+            margin.bottom = tmp;
+        }
+
+        private void FontFamily_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void FontSize_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float tmp = fontSize;
+            ParseTextToFloat((sender as TextBox).Text, ref tmp);
+            fontSize = tmp;
         }
     }
 }

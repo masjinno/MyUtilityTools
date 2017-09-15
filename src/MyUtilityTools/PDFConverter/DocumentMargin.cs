@@ -8,10 +8,10 @@ namespace PDFConverter
 {
     public class DocumentMargin
     {
-        public float left { get; set; }
-        public float right { get; set; }
-        public float top { get; set; }
-        public float bottom { get; set; }
+        public float left { get; set; } = 0F;
+        public float right { get; set; } = 0F;
+        public float top { get; set; } = 0F;
+        public float bottom { get; set; } = 0F;
 
         public DocumentMargin()
         {
