@@ -47,7 +47,7 @@ namespace PDFConverter
         {
             InitializeComponent();
 
-            margin = new DocumentMargin(20f, 20f, 50f, 20f);
+            margin = new DocumentMargin(30f, 30f, 50f, 50f);
 
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             this.outputFilePath = System.IO.Path.GetDirectoryName(exePath) + @"\OUTPUT.pdf";
@@ -99,6 +99,8 @@ namespace PDFConverter
                 string pdfPath = textPath + ".pdf";
                 eachPdfPathList.Add(pdfPath);
 
+                string textFileName = System.IO.Path.GetFileName(textPath);
+
                 using (FileStream fs = new FileStream(pdfPath, FileMode.Create))
                 {
                     using (Document doc = new Document(PageSize.A4, margin.left, margin.right, margin.top, margin.bottom))
@@ -106,8 +108,9 @@ namespace PDFConverter
                         PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
                         ITextEvents itextEvents = new ITextEvents();
                         itextEvents.Margin = margin;
-                        itextEvents.HeaderFont = font;
-                        itextEvents.HeaderBaseFont = baseFont;
+                        itextEvents.font = font;
+                        itextEvents.baseFont = baseFont;
+                        itextEvents.convertedFileName = textFileName;
                         pdfWriter.PageEvent = itextEvents;
                         doc.Open();
 

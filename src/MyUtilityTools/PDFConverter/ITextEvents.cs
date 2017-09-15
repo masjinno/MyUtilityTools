@@ -17,7 +17,7 @@ namespace PDFConverter
         PdfTemplate headerTemplate, footerTemplate;
 
         // this is the BaseFont we are going to use for the header / footer
-        public BaseFont HeaderBaseFont { get; set; } = null;
+        public BaseFont baseFont { get; set; } = null;
 
         // This keeps track of the creation time
         DateTime PrintTime = DateTime.Now;
@@ -26,7 +26,10 @@ namespace PDFConverter
         public DocumentMargin Margin { get; set; }
 
         // Base font
-        public iTextSharp.text.Font HeaderFont { get; set; }
+        public iTextSharp.text.Font font { get; set; }
+
+        // Text file name
+        public string convertedFileName { get; set; }
 
         #region Fields
         private string _header;
@@ -45,7 +48,7 @@ namespace PDFConverter
             try
             {
                 PrintTime = DateTime.Now;
-                HeaderBaseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 cb = writer.DirectContent;
                 headerTemplate = cb.CreateTemplate(100, 100);
                 footerTemplate = cb.CreateTemplate(50, 50);
@@ -61,97 +64,39 @@ namespace PDFConverter
         public override void OnEndPage(iTextSharp.text.pdf.PdfWriter writer, iTextSharp.text.Document document)
         {
             base.OnEndPage(writer, document);
-            Phrase p1Header = new Phrase("Sample Header Here", HeaderFont);
 
-            //Create PdfTable object
-            PdfPTable pdfTab = new PdfPTable(3);
+            /// Create PdfTable object
+            PdfPTable pdfHeaderTable = new PdfPTable(1);
+            PdfPTable pdfFooterTable = new PdfPTable(1);
 
-            //We will have to create separate cells to include image logo and 2 separate strings
-            //Row 1
-            PdfPCell pdfCell1 = new PdfPCell();
-            PdfPCell pdfCell2 = new PdfPCell(p1Header);
-            PdfPCell pdfCell3 = new PdfPCell();
-            String text = "Page " + writer.PageNumber + " of ";
-
-            //Add paging to header
-            {
-                cb.BeginText();
-                cb.SetFontAndSize(HeaderBaseFont, 12);
-                cb.SetTextMatrix(document.PageSize.GetRight(200), document.PageSize.GetTop(45));
-                cb.ShowText(text);
-                cb.EndText();
-                float len = HeaderBaseFont.GetWidthPoint(text, 12);
-                //Adds "12" in Page 1 of 12
-                cb.AddTemplate(headerTemplate, document.PageSize.GetRight(200) + len, document.PageSize.GetTop(45));
-            }
-            //Add paging to footer
-            {
-                cb.BeginText();
-                cb.SetFontAndSize(HeaderBaseFont, 12);
-                cb.SetTextMatrix(document.PageSize.GetRight(180), document.PageSize.GetBottom(30));
-                cb.ShowText(text);
-                cb.EndText();
-                float len = HeaderBaseFont.GetWidthPoint(text, 12);
-                cb.AddTemplate(footerTemplate, document.PageSize.GetRight(180) + len, document.PageSize.GetBottom(30));
-            }
-
-            //Row 2
-            PdfPCell pdfCell4 = new PdfPCell(new Phrase("Sub Header Description", HeaderFont));
-
-            //Row 3 
-            PdfPCell pdfCell5 = new PdfPCell(new Phrase("Date:" + PrintTime.ToShortDateString(), HeaderFont));
-            PdfPCell pdfCell6 = new PdfPCell();
-            PdfPCell pdfCell7 = new PdfPCell(new Phrase("TIME:" + string.Format("{0:t}", DateTime.Now), HeaderFont));
-
-            //set the alignment of all three cells and set border to 0
-            pdfCell1.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell2.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell3.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell4.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell5.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell6.HorizontalAlignment = Element.ALIGN_CENTER;
-            pdfCell7.HorizontalAlignment = Element.ALIGN_CENTER;
-
-            pdfCell2.VerticalAlignment = Element.ALIGN_BOTTOM;
-            pdfCell3.VerticalAlignment = Element.ALIGN_MIDDLE;
-            pdfCell4.VerticalAlignment = Element.ALIGN_TOP;
-            pdfCell5.VerticalAlignment = Element.ALIGN_MIDDLE;
-            pdfCell6.VerticalAlignment = Element.ALIGN_MIDDLE;
-            pdfCell7.VerticalAlignment = Element.ALIGN_MIDDLE;
-
-            pdfCell4.Colspan = 3;
-
-            pdfCell1.Border = 0;
-            pdfCell2.Border = 0;
-            pdfCell3.Border = 0;
-            pdfCell4.Border = 0;
-            pdfCell5.Border = 0;
-            pdfCell6.Border = 0;
-            pdfCell7.Border = 0;
-
-            //add all three cells into PdfTable
-            pdfTab.AddCell(pdfCell1);
-            pdfTab.AddCell(pdfCell2);
-            pdfTab.AddCell(pdfCell3);
-            pdfTab.AddCell(pdfCell4);
-            pdfTab.AddCell(pdfCell5);
-            pdfTab.AddCell(pdfCell6);
-            pdfTab.AddCell(pdfCell7);
-
-            pdfTab.TotalWidth = document.PageSize.Width - (Margin.left + Margin.right);
-            pdfTab.WidthPercentage = 100;
-            //pdfTab.HorizontalAlignment = Element.ALIGN_CENTER;    
-
-            //call WriteSelectedRows of PdfTable. This writes rows from PdfWriter in PdfTable
-            //first param is start row. -1 indicates there is no end row and all the rows to be included to write
-            //Third and fourth param is x and y position to start writing
-            pdfTab.WriteSelectedRows(0, -1, 40, document.PageSize.Height - 30, writer.DirectContent);
-            //set pdfContent value
+            /// Header Setting
+            Phrase headerPhrase = new Phrase(this.convertedFileName, font);
+            PdfPCell pdfHeaderCell = new PdfPCell(headerPhrase);
+            pdfHeaderCell.HorizontalAlignment = Element.ALIGN_LEFT;
+            pdfHeaderCell.VerticalAlignment = Element.ALIGN_CENTER;
+            pdfHeaderCell.Border = 0;
+            pdfHeaderTable.AddCell(pdfHeaderCell);
+            pdfHeaderTable.TotalWidth = document.PageSize.Width - (Margin.left + Margin.right);
+            pdfHeaderTable.WidthPercentage = 100;
+            pdfHeaderTable.WriteSelectedRows(0, -1, Margin.left, document.PageSize.Height - Margin.top * 0.5F, writer.DirectContent);
 
             //Move the pointer and draw line to separate header section from rest of page
             cb.MoveTo(Margin.left, document.PageSize.Height - Margin.top);
             cb.LineTo(document.PageSize.Width - Margin.right, document.PageSize.Height - Margin.top);
             cb.Stroke();
+
+            /// Footer Setting
+            StringBuilder sb = new StringBuilder();
+            sb.Append("< ").Append(writer.PageNumber).Append(" >");
+            Phrase footerPhrase = new Phrase(sb.ToString());
+            PdfPCell pdfFooterCell = new PdfPCell(footerPhrase);
+            pdfFooterCell.HorizontalAlignment = Element.ALIGN_CENTER;
+            pdfFooterCell.VerticalAlignment = Element.ALIGN_CENTER;
+            pdfFooterCell.Border = 0;
+            pdfFooterTable.AddCell(pdfFooterCell);
+            pdfFooterTable.TotalWidth = document.PageSize.Width - (Margin.left + Margin.right);
+            pdfFooterTable.WidthPercentage = 100;
+            pdfFooterTable.WriteSelectedRows(0, -1, Margin.left, Margin.bottom * 0.8F, writer.DirectContent);
 
             //Move the pointer and draw line to separate footer section from rest of page
             cb.MoveTo(Margin.left, document.PageSize.GetBottom(Margin.bottom));
@@ -164,13 +109,13 @@ namespace PDFConverter
             base.OnCloseDocument(writer, document);
 
             headerTemplate.BeginText();
-            headerTemplate.SetFontAndSize(HeaderBaseFont, 12);
+            headerTemplate.SetFontAndSize(baseFont, 12);
             headerTemplate.SetTextMatrix(0, 0);
             headerTemplate.ShowText((writer.PageNumber).ToString());
             headerTemplate.EndText();
 
             footerTemplate.BeginText();
-            footerTemplate.SetFontAndSize(HeaderBaseFont, 12);
+            footerTemplate.SetFontAndSize(baseFont, 12);
             footerTemplate.SetTextMatrix(0, 0);
             footerTemplate.ShowText((writer.PageNumber).ToString());
             footerTemplate.EndText();
