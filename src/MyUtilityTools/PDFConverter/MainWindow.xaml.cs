@@ -125,6 +125,24 @@ namespace PDFConverter
             return retBaseFont;
         }
 
+        private string ReplaceTabToSpace(string text, int spaceNum)
+        {
+            if (spaceNum <= 0) return text;
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < spaceNum; i++)
+            {
+                sb.Append(" ");
+            }
+
+            string spaces = sb.ToString();
+            string retText;
+
+            retText = text.Replace("\t", spaces);
+
+            return retText;
+        }
+
         private void Convert_Button_Click(object sender, RoutedEventArgs e)
         {
             List<string> pathList = new List<string>();
@@ -175,6 +193,7 @@ namespace PDFConverter
                         Encoding enc = Encoding.GetEncoding(932);
                         StreamReader sr = new StreamReader(textPath, enc);
                         string text = sr.ReadToEnd();
+                        string noTabText = this.ReplaceTabToSpace(text, 4);
 
                         #region how to research usable fonts
                         //int totalfonts = FontFactory.RegisterDirectory("C:\\WINDOWS\\Fonts");
@@ -187,7 +206,7 @@ namespace PDFConverter
                         #endregion
 
                         sr.Close();
-                        doc.Add(new iTextSharp.text.Paragraph(text, bodyFont));
+                        doc.Add(new iTextSharp.text.Paragraph(noTabText, bodyFont));
 
                         doc.Close();
                     }
