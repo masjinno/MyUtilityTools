@@ -15,6 +15,17 @@
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
+
+    <!-- コンテキストメニュー -->
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Require IP Address"/>
+            <MenuItem Header="Another IP" Command="{Binding Path=ClosingCommand}"/>
+            <Separator/>
+            <MenuItem Header="IPv4" IsCheckable="True" IsChecked="True"/>
+            <MenuItem Header="IPv6" IsCheckable="True" IsChecked="False"/>
+        </ContextMenu>
+    </Window.ContextMenu>
     
     <Grid>
         <TextBlock Text="{Binding Path=IPv4}"
