@@ -163,6 +163,9 @@ namespace IPAddressViewer.ViewModel
             }
         }
 
+        /// <summary>
+        /// IPアドレス要求コマンド
+        /// </summary>
         public ICommand RequireIPAddressCommand
         {
             get
