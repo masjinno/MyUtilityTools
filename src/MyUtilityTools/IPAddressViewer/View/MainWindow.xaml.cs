@@ -23,6 +23,7 @@ namespace IPAddressViewer.View
         public MainWindow()
         {
             InitializeComponent();
+            this.MouseLeftButtonDown += (object sender, MouseButtonEventArgs e) => this.DragMove();
         }
     }
 }
