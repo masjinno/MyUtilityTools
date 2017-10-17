@@ -19,7 +19,7 @@
     <!-- コンテキストメニュー -->
     <Window.ContextMenu>
         <ContextMenu>
-            <MenuItem Header="Require IP Address"/>
+            <MenuItem Header="Require IP Address" Command="{Binding Path=RequireIPAddressCommand}"/>
             <MenuItem Header="Another IP"/>
             <Separator/>
             <MenuItem Header="IPv4" IsCheckable="True" IsChecked="{Binding Path=IsIPv4Checked}" Command="{Binding Path=IPv4ChooseCommand}"/>

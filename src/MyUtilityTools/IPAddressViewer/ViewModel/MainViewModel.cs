@@ -13,9 +13,14 @@ namespace IPAddressViewer.ViewModel
     public class MainViewModel : BindableBase
     {
         /// <summary>
-        /// IPアドレス処理クラス
+        /// IPv4アドレス処理クラス
         /// </summary>
-        private IPAddressProc ipAddressProc;
+        private IPv4AddressProc ipv4AddressProc;
+
+        /// <summary>
+        /// IPv6アドレス処理クラス
+        /// </summary>
+        private IPv6AddressProc ipv6AddressProc;
 
         /// <summary>
         /// IPv4アドレスの文字列
@@ -24,7 +29,7 @@ namespace IPAddressViewer.ViewModel
         {
             get
             {
-                if (this.IPv4Index >= 0) return this.ipAddressProc.V4AddressList[IPv4Index];
+                if (this.IPv4Index >= 0) return this.ipv4AddressProc.V4AddressList[IPv4Index];
                 else return "IPv4 is invalid";
             }
         }
@@ -36,7 +41,7 @@ namespace IPAddressViewer.ViewModel
         {
             get
             {
-                if (this.IPv6Index >= 0) return this.ipAddressProc.V6AddressList[IPv6Index];
+                if (this.IPv6Index >= 0) return this.ipv6AddressProc.V6AddressList[IPv6Index];
                 else return "IPv6 is invalid";
             }
         }
@@ -51,8 +56,8 @@ namespace IPAddressViewer.ViewModel
             get
             {
                 if (this.IsIPv4Checked) return this.ipv4;
-                else if (this.IsIPv6Checked) return this.ipv6;
-                else return "Checked IPAddress is invalid";
+                if (this.IsIPv6Checked) return this.ipv6;
+                return "Checked IPAddress is invalid";
             }
         }
 
@@ -65,9 +70,9 @@ namespace IPAddressViewer.ViewModel
             get
             {
                 int prevIndex = this._ipv4Index;
-                if (this.ipAddressProc.V4AddressList.Count() >= prevIndex) return 0;
-                if (this.ipAddressProc.V4AddressList.Count() <= 0) return -1;
-                else return this._ipv4Index;
+                if (this.ipv4AddressProc.V4AddressList.Count() >= prevIndex) return 0;
+                if (this.ipv4AddressProc.V4AddressList.Count() <= 0) return -1;
+                return this._ipv4Index;
             }
             set { SetProperty(ref _ipv4Index, value); }
         }
@@ -81,9 +86,9 @@ namespace IPAddressViewer.ViewModel
             get
             {
                 int prevIndex = this._ipv6Index;
-                if (this.ipAddressProc.V6AddressList.Count() >= prevIndex) return 0;
-                if (this.ipAddressProc.V6AddressList.Count() <= 0) return -1;
-                else return this._ipv6Index;
+                if (this.ipv6AddressProc.V6AddressList.Count() >= prevIndex) return 0;
+                if (this.ipv6AddressProc.V6AddressList.Count() <= 0) return -1;
+                return this._ipv6Index;
             }
             set { SetProperty(ref _ipv6Index, value); }
         }
@@ -108,7 +113,7 @@ namespace IPAddressViewer.ViewModel
             set
             {
                 SetProperty(ref this._isIPv4Checked, value);
-                RaisePropertyChanged(nameof(IPAddressString));
+                RaisePropertyChanged(nameof(this.IPAddressString));
             }
         }
 
@@ -122,7 +127,7 @@ namespace IPAddressViewer.ViewModel
             set
             {
                 SetProperty(ref this._isIPv6Checked, value);
-                RaisePropertyChanged(nameof(IPAddressString));
+                RaisePropertyChanged(nameof(this.IPAddressString));
             }
         }
 
@@ -158,6 +163,17 @@ namespace IPAddressViewer.ViewModel
             }
         }
 
+        public ICommand RequireIPAddressCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    RaisePropertyChanged(nameof(this.IPAddressString));
+                });
+            }
+        }
+
         #endregion
 
 
@@ -174,7 +190,8 @@ namespace IPAddressViewer.ViewModel
         /// </summary>
         private void Init()
         {
-            this.ipAddressProc = new IPAddressProc();
+            this.ipv4AddressProc = new IPv4AddressProc();
+            this.ipv6AddressProc = new IPv6AddressProc();
             this.IPAddressFontSize = 48;    // 暫定値
             this.IsIPv4Checked = true;
             this.IsIPv6Checked = false;

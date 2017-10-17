@@ -80,6 +80,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Model\IPAddressProc.cs" />
+    <Compile Include="Model\IPv4AddressProc.cs" />
+    <Compile Include="Model\IPv6AddressProc.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
