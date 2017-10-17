@@ -98,6 +98,9 @@ namespace IPAddressViewer.ViewModel
             set { SetProperty(ref this._ipAddressFontSize, value); }
         }
 
+        /// <summary>
+        /// IPv4を選択しているか
+        /// </summary>
         private bool _isIPv4Checked;
         public bool IsIPv4Checked
         {
@@ -109,6 +112,9 @@ namespace IPAddressViewer.ViewModel
             }
         }
 
+        /// <summary>
+        /// IPv6を選択しているか
+        /// </summary>
         private bool _isIPv6Checked;
         public bool IsIPv6Checked
         {
@@ -124,6 +130,9 @@ namespace IPAddressViewer.ViewModel
 
         #region Binding用コマンド
 
+        /// <summary>
+        /// IPv4選択時に処理するコマンド
+        /// </summary>
         public ICommand IPv4ChooseCommand
         {
             get
@@ -135,6 +144,9 @@ namespace IPAddressViewer.ViewModel
             }
         }
 
+        /// <summary>
+        /// IPv6選択時に処理するコマンド
+        /// </summary>
         public ICommand IPv6ChooseCommand
         {
             get
