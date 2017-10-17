@@ -144,7 +144,8 @@ namespace IPAddressViewer.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    this.IsIPv6Checked = !this.IsIPv4Checked;
+                    this.IsIPv4Checked = true;
+                    this.IsIPv6Checked = false;
                 });
             }
         }
@@ -158,7 +159,8 @@ namespace IPAddressViewer.ViewModel
             {
                 return new DelegateCommand(() =>
                 {
-                    this.IsIPv4Checked = !this.IsIPv6Checked;
+                    this.IsIPv6Checked = true;
+                    this.IsIPv4Checked = false;
                 });
             }
         }
