@@ -20,15 +20,15 @@
     <Window.ContextMenu>
         <ContextMenu>
             <MenuItem Header="Require IP Address"/>
-            <MenuItem Header="Another IP" Command="{Binding Path=ClosingCommand}"/>
+            <MenuItem Header="Another IP"/>
             <Separator/>
-            <MenuItem Header="IPv4" IsCheckable="True" IsChecked="True"/>
-            <MenuItem Header="IPv6" IsCheckable="True" IsChecked="False"/>
+            <MenuItem Header="IPv4" IsCheckable="True" IsChecked="{Binding Path=IsIPv4Checked}" Command="{Binding Path=IPv4ChooseCommand}"/>
+            <MenuItem Header="IPv6" IsCheckable="True" IsChecked="{Binding Path=IsIPv6Checked}" Command="{Binding Path=IPv6ChooseCommand}"/>
         </ContextMenu>
     </Window.ContextMenu>
-    
+
     <Grid>
-        <TextBlock Text="{Binding Path=IPv4}"
+        <TextBlock Text="{Binding Path=IPAddressString}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontSize="{Binding Path=IPAddressFontSize}"/>

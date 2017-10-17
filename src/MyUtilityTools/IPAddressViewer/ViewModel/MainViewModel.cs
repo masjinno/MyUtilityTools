@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace IPAddressViewer.ViewModel
 {
@@ -15,16 +16,43 @@ namespace IPAddressViewer.ViewModel
         /// IPアドレス処理クラス
         /// </summary>
         private IPAddressProc ipAddressProc;
-        
+
         /// <summary>
         /// IPv4アドレスの文字列
         /// </summary>
-        public string IPv4
+        private string ipv4
         {
             get
             {
                 if (this.IPv4Index >= 0) return this.ipAddressProc.V4AddressList[IPv4Index];
                 else return "IPv4 is invalid";
+            }
+        }
+
+        /// <summary>
+        /// IPv6アドレスの文字列
+        /// </summary>
+        public string ipv6
+        {
+            get
+            {
+                if (this.IPv6Index >= 0) return this.ipAddressProc.V6AddressList[IPv6Index];
+                else return "IPv6 is invalid";
+            }
+        }
+
+        #region Binding用プロパティ
+
+        /// <summary>
+        /// 表示するIPアドレス文字列
+        /// </summary>
+        public string IPAddressString
+        {
+            get
+            {
+                if (this.IsIPv4Checked) return this.ipv4;
+                else if (this.IsIPv6Checked) return this.ipv6;
+                else return "Checked IPAddress is invalid";
             }
         }
 
@@ -45,6 +73,22 @@ namespace IPAddressViewer.ViewModel
         }
 
         /// <summary>
+        /// IPv6アドレスのリスト
+        /// </summary>
+        private int _ipv6Index;
+        public int IPv6Index
+        {
+            get
+            {
+                int prevIndex = this._ipv6Index;
+                if (this.ipAddressProc.V6AddressList.Count() >= prevIndex) return 0;
+                if (this.ipAddressProc.V6AddressList.Count() <= 0) return -1;
+                else return this._ipv6Index;
+            }
+            set { SetProperty(ref _ipv6Index, value); }
+        }
+
+        /// <summary>
         /// IPアドレスのフォントサイズ
         /// </summary>
         private double _ipAddressFontSize;
@@ -54,11 +98,56 @@ namespace IPAddressViewer.ViewModel
             set { SetProperty(ref this._ipAddressFontSize, value); }
         }
 
-
-        private void ClientAreaSizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        private bool _isIPv4Checked;
+        public bool IsIPv4Checked
         {
-            System.Windows.MessageBox.Show("message");
+            get { return this._isIPv4Checked; }
+            set
+            {
+                SetProperty(ref this._isIPv4Checked, value);
+                RaisePropertyChanged(nameof(IPAddressString));
+            }
         }
+
+        private bool _isIPv6Checked;
+        public bool IsIPv6Checked
+        {
+            get { return this._isIPv6Checked; }
+            set
+            {
+                SetProperty(ref this._isIPv6Checked, value);
+                RaisePropertyChanged(nameof(IPAddressString));
+            }
+        }
+
+        #endregion
+
+        #region Binding用コマンド
+
+        public ICommand IPv4ChooseCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    this.IsIPv6Checked = !this.IsIPv4Checked;
+                });
+            }
+        }
+
+        public ICommand IPv6ChooseCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    this.IsIPv4Checked = !this.IsIPv6Checked;
+                });
+            }
+        }
+
+        #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -75,6 +164,8 @@ namespace IPAddressViewer.ViewModel
         {
             this.ipAddressProc = new IPAddressProc();
             this.IPAddressFontSize = 48;    // 暫定値
+            this.IsIPv4Checked = true;
+            this.IsIPv6Checked = false;
         }
 
         private double CalcFontSize(double rectWidth, double rectHeight)

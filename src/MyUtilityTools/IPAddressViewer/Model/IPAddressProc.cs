@@ -28,10 +28,30 @@ namespace IPAddressViewer.Model
                     if (add.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     {
                         v4Address.Add(add.ToString());
-                        //System.Windows.Forms.MessageBox.Show(address + "\n" + add.ToString(), "address");
                     }
                 }
                 return v4Address;
+            }
+        }
+
+        public List<string> V6AddressList
+        {
+            get
+            {
+                string hostname = Dns.GetHostName();
+
+                // ホスト名からIPアドレスを取得する
+                IPAddress[] adrList = Dns.GetHostAddresses(hostname);
+
+                List<string> v6Address = new List<string>();
+                foreach (IPAddress add in adrList)
+                {
+                    if (add.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    {
+                        v6Address.Add(add.ToString());
+                    }
+                }
+                return v6Address;
             }
         }
     }
