@@ -29,10 +29,11 @@
         </ContextMenu>
     </Window.ContextMenu>
 
-    <Grid>
+    <Grid x:Name="ClientGrid">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SizeChanged">
-                <i:InvokeCommandAction Command="{Binding Path=ClientAreaSizeChangedCommand}" CommandParameter="{Binding }"/>
+                <i:InvokeCommandAction Command="{Binding Path=ClientAreaSizeChangedCommand}"
+                                       CommandParameter="{Binding ElementName=ClientGrid}"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
         <TextBlock Text="{Binding Path=IPAddressString}"

@@ -207,8 +207,10 @@ namespace IPAddressViewer.ViewModel
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand<System.Windows.Controls.Grid>((sender) =>
                 {
+                    double width = sender.ActualWidth;
+                    double height = sender.ActualHeight;
                     System.Windows.MessageBox.Show("grid size changed.");
                 });
             }
