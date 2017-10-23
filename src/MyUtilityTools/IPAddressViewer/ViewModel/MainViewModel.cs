@@ -131,6 +131,26 @@ namespace IPAddressViewer.ViewModel
             }
         }
 
+        /// <summary>
+        /// クライアント領域の幅
+        /// </summary>
+        private double _clientWidth;
+        public double ClientWidth
+        {
+            get { return this._clientWidth; }
+            set { SetProperty(ref this._clientWidth, value); }
+        }
+
+        /// <summary>
+        /// クライアント領域の高さ
+        /// </summary>
+        private double _clientHeight;
+        public double ClientHeight
+        {
+            get { return this._clientHeight; }
+            set { SetProperty(ref this._clientHeight, value); }
+        }
+
         #endregion
 
         #region Binding用コマンド
@@ -175,6 +195,21 @@ namespace IPAddressViewer.ViewModel
                 return new DelegateCommand(() =>
                 {
                     RaisePropertyChanged(nameof(this.IPAddressString));
+                });
+            }
+        }
+
+        /// <summary>
+        /// クライアント領域のサイズ変更イベント
+        /// IPアドレス文字列の文字サイズをフィットするサイズに変更する(未実装)
+        /// </summary>
+        public ICommand ClientAreaSizeChangedCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    System.Windows.MessageBox.Show("grid size changed.");
                 });
             }
         }
