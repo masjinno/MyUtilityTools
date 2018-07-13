@@ -167,50 +167,57 @@ namespace PDFConverter
             BaseFont baseFont = GetBaseFont();
 
             List<string> eachPdfPathList = new List<string>();
-            foreach (string textPath in pathList)
+            foreach (string path in pathList)
             {
-                string pdfPath = textPath + ".pdf";
-                eachPdfPathList.Add(pdfPath);
-
-                string textFileName = System.IO.Path.GetFileName(textPath);
-
-                using (FileStream fs = new FileStream(pdfPath, FileMode.Create))
+                string pdfPath;
+                if (this.PdfInput_CheckBox.IsChecked == true) {
+                    pdfPath = path;
+                }
+                else
                 {
-                    using (Document doc = new Document(this.pageSize, this.margin.left, this.margin.right, this.margin.top, this.margin.bottom))
+                    pdfPath = path + ".pdf";
+
+                    string textFileName = System.IO.Path.GetFileName(path);
+
+                    using (FileStream fs = new FileStream(pdfPath, FileMode.Create))
                     {
-                        PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
-                        ITextEvents itextEvents = new ITextEvents();
-                        itextEvents.Margin = margin;
-                        itextEvents.headerFont = headerFont;
-                        itextEvents.footerFont = footerFont;
-                        itextEvents.baseFont = baseFont;
-                        itextEvents.convertedFileName = textFileName;
-                        pdfWriter.PageEvent = itextEvents;
-                        doc.Open();
+                        using (Document doc = new Document(this.pageSize, this.margin.left, this.margin.right, this.margin.top, this.margin.bottom))
+                        {
+                            PdfWriter pdfWriter = PdfWriter.GetInstance(doc, fs);
+                            ITextEvents itextEvents = new ITextEvents();
+                            itextEvents.Margin = margin;
+                            itextEvents.headerFont = headerFont;
+                            itextEvents.footerFont = footerFont;
+                            itextEvents.baseFont = baseFont;
+                            itextEvents.convertedFileName = textFileName;
+                            pdfWriter.PageEvent = itextEvents;
+                            doc.Open();
 
-                        ///TODO: ファイルエンコードの取得と設定
-                        ///932:SJIS
-                        Encoding enc = Encoding.GetEncoding(932);
-                        StreamReader sr = new StreamReader(textPath, enc);
-                        string text = sr.ReadToEnd();
-                        string noTabText = this.ReplaceTabToSpace(text, 4);
+                            ///TODO: ファイルエンコードの取得と設定
+                            ///932:SJIS
+                            Encoding enc = Encoding.GetEncoding(932);
+                            StreamReader sr = new StreamReader(path, enc);
+                            string text = sr.ReadToEnd();
+                            string noTabText = this.ReplaceTabToSpace(text, 4);
 
-                        #region how to research usable fonts
-                        //int totalfonts = FontFactory.RegisterDirectory("C:\\WINDOWS\\Fonts");
-                        //StringBuilder sb = new StringBuilder();
-                        //foreach (string fontname in FontFactory.RegisteredFonts)
-                        //{
-                        //    sb.Append(fontname + "\n");
-                        //}
-                        //doc.Add(new iTextSharp.text.Paragraph("All Fonts:\n" + sb.ToString()));
-                        #endregion
+                            #region how to research usable fonts
+                            //int totalfonts = FontFactory.RegisterDirectory("C:\\WINDOWS\\Fonts");
+                            //StringBuilder sb = new StringBuilder();
+                            //foreach (string fontname in FontFactory.RegisteredFonts)
+                            //{
+                            //    sb.Append(fontname + "\n");
+                            //}
+                            //doc.Add(new iTextSharp.text.Paragraph("All Fonts:\n" + sb.ToString()));
+                            #endregion
 
-                        sr.Close();
-                        doc.Add(new iTextSharp.text.Paragraph(noTabText, bodyFont));
+                            sr.Close();
+                            doc.Add(new iTextSharp.text.Paragraph(noTabText, bodyFont));
 
-                        doc.Close();
+                            doc.Close();
+                        }
                     }
                 }
+                eachPdfPathList.Add(pdfPath);
             }
             
             this.JoinPdf(this.outputFilePath, eachPdfPathList);
