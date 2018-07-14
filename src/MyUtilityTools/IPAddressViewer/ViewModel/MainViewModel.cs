@@ -211,7 +211,8 @@ namespace IPAddressViewer.ViewModel
                 {
                     double width = sender.ActualWidth;
                     double height = sender.ActualHeight;
-                    System.Windows.MessageBox.Show("grid size changed.");
+                    this.IPAddressFontSize = this.CalcFontSize(width, height, this.IPAddressString);
+                    RaisePropertyChanged(nameof(this.IPAddressFontSize));
                 });
             }
         }
@@ -239,13 +240,63 @@ namespace IPAddressViewer.ViewModel
             this.IsIPv6Checked = false;
         }
 
-        private double CalcFontSize(double rectWidth, double rectHeight)
+        /// <summary>
+        /// サイズ(<paramref name="rectWidth"/>, <paramref name="rectHeight"/>)の矩形領域の内側にフィットする、
+        /// <paramref name="text"/>のテキストを持つTextBlockのフォントサイズを求める。
+        /// </summary>
+        /// <param name="rectWidth">矩形領域の幅(pixel)</param>
+        /// <param name="rectHeight">矩形領域の高さ(pixel)</param>
+        /// <param name="text">TextBlockのtext</param>
+        /// <returns>フォントサイズ</returns>
+        private double CalcFontSize(double rectWidth, double rectHeight, string text)
         {
-            double retFontSize = 11;
+            if (text == null) throw new ArgumentNullException();
+            if (rectWidth < 0 || rectHeight < 0) throw new ArgumentOutOfRangeException();
+            if (text == string.Empty || text.Length <= 0) throw new ArgumentException();
 
+            const double MIN_SEARCH_SIZE = 0.5;
+            const double START_FONT_SIZE = MIN_SEARCH_SIZE * 129;
+            double retFontSize = START_FONT_SIZE;
+            double searchJumpSize = START_FONT_SIZE / 2.0;
+            bool isFirstSmaller = true;
 
+            System.Windows.Controls.TextBlock dummyTextBlock = new System.Windows.Controls.TextBlock();
+            dummyTextBlock.Text = text;
+
+            while (searchJumpSize > MIN_SEARCH_SIZE)
+            {
+                dummyTextBlock.FontSize = retFontSize;
+
+                if (this.IsBiggerRect(dummyTextBlock.ActualWidth, dummyTextBlock.ActualHeight, rectWidth, rectHeight))
+                {
+                    searchJumpSize *= 0.5;
+                    retFontSize -= searchJumpSize;
+                    isFirstSmaller = false;
+                }
+                else
+                {
+                    if (!isFirstSmaller)
+                    {
+                        searchJumpSize *= 0.5;
+                    }
+                    retFontSize += searchJumpSize;
+                }
+            }
 
             return retFontSize;
+        }
+
+        /// <summary>
+        /// 判定対象の矩形が比較対象の矩形からはみ出るか判定する
+        /// </summary>
+        /// <param name="targetRectWidth">判定対象矩形の幅</param>
+        /// <param name="targetRectHeight">判定対象矩形の高さ</param>
+        /// <param name="compRectWidth">比較対象矩形の幅</param>
+        /// <param name="compRectHeight">比較対象矩形の高さ</param>
+        /// <returns>判定対象の矩形が比較対象の矩形からはみ出るか</returns>
+        private bool IsBiggerRect(double targetRectWidth, double targetRectHeight, double compRectWidth, double compRectHeight)
+        {
+            return (targetRectWidth > compRectWidth || targetRectHeight > compRectHeight);
         }
     }
 }
